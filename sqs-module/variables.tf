@@ -9,4 +9,3 @@ variable "queue_names" {
   type        = list(string)
   default     = ["red-queue", "green-queue"]
 }
-
