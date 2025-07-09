@@ -67,3 +67,54 @@ resource "aws_iam_policy" "sqs_producer_policy" {
         ]
     })
 }
+
+# creating IAM roles to consume and write to the sqs queues
+resource "aws_iam_role" "sqs_consumer_role" {
+    count = var.create_roles ? length(var.queue_names) : 0 # using count to create the condition)
+
+    name = "${var.queue_names[count.index]}-consumer-role"
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Action = "sts:AssumeRole"
+                Effect = "Allow"
+                Principal = {
+                    Service = "sqs.amazonaws.com"
+                }
+            }
+        ]
+    })
+
+}
+
+resource "aws_iam_role" "sqs_producer_role" {
+    count = var.create_roles ? length(var.queue_names) : 0 # using count to create the condition)
+
+    name = "${var.queue_names[count.index]}-producer-role"
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {   
+                Action = "sts:AssumeRole"
+                Effect = "Allow"
+                Principal = {
+                    Service = "sqs.amazonaws.com"
+                }
+            }
+        ]
+    })
+}
+
+# this attaches the policies to the roles with conditions 
+resource "aws_iam_role_policy_attachment" "consumer_policy_attachment" {
+    count = var.create_roles ? length(var.queue_names) : 0 # using count to create the condition)
+    role = aws_iam_role.sqs_consumer_role[count.index].name
+    policy_arn = aws_iam_policy.sqs_consumer_policy[var.queue_names[count.index]].arn 
+}
+
+resource "aws_iam_role_policy_attachment" "producer_policy_attachment" {
+    count = var.create_roles ? length(var.queue_names) : 0 # using count to create the condition)
+    role = aws_iam_role.sqs_producer_role[count.index].name
+    policy_arn = aws_iam_policy.sqs_producer_policy[var.queue_names[count.index]].arn 
+}
