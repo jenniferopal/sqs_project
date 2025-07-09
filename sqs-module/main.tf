@@ -19,8 +19,12 @@ resource "aws_sqs_queue" "dlq" {
 resource "aws_sqs_queue" "main_queue" {
     for_each = toset(var.queue_names)
 
-    name     = each.key
-    
+    name = each.key
+    delay_seconds = 90
+    max_message_size = 2048
+    message_retention_seconds = 86400 # 1 day
+    receive_wait_time_seconds = 10
+        
     redrive_policy = jsonencode({
         deadLetterTargetArn = aws_sqs_queue.dlq[each.key].arn
         maxReceiveCount     = 5
