@@ -13,3 +13,12 @@ output "write_policy_arn" {
     value       = { for k, v in aws_iam_policy.sqs_producer_policy : k => v.arn }
 }
 
+output "consumer_roles" {
+    description = "arns of the consumer roles created"
+    value       = { for k, v in aws_iam_role.sqs_consumer_role : k => v.arn }
+}
+
+output "producer_roles" {
+    description = "arns of the producer roles created"
+    value       = { for k, v in aws_iam_role.sqs_producer_role : k => v.arn }
+}
