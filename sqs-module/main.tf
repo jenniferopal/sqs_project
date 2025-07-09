@@ -1,18 +1,12 @@
 terraform {
+    required_version = ">= 1.0.0"
+
     required_providers {
-        hashicorp = {
-            source  = "hashicorp/terraform"
-            version = "~> 1.0.0"
-        }
         aws = {
             source  = "hashicorp/aws"
             version = "~> 3.48.0"
         }
     }
-}
-
-provider "aws" {
-  region = var.aws_region
 }
 
 # this module is the dead letter queue
