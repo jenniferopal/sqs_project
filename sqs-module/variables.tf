@@ -6,5 +6,6 @@ variable "queue_names" {
 
 variable "create_roles" {
   description = "boolean that conditionally creates an IAM role for each policy."
-  type = boolean
+  type = bool
+  default = true # setting to true to create iam roles for the queues  
 }
