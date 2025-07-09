@@ -3,3 +3,8 @@ variable "queue_names" {
   type        = list(string)
   default     = ["red-queue", "green-queue"]
 }
+
+variable "create_roles" {
+  description = "boolean that conditionally creates an IAM role for each policy."
+  type = boolean
+}
