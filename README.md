@@ -7,7 +7,7 @@ A Terraform module that creates SQS queues with dead letter queues and IAM polic
 ```hcl
 module "sqs_queues" {
   source = "./sqs-module"
-  queue_names = ["processing-queue", "notification-queue"]
+  queue_names = ["queue-1", "queue-2"]
   create_roles = true
 }
 ```
@@ -33,46 +33,43 @@ The `sqs_queues.py` script monitors message counts in your queues and automatica
 
 1. Install boto3: `pip install boto3`
 2. Configure AWS credentials
-3. Obtain your full SQS queue URLs from the AWS Console
+3. Obtain your SQS queue names from the AWS Console
 
 ### Usage
 
 **Command Line:**
 ```bash
-python sqs_queues.py https://sqs.us-east-1.amazonaws.com/YOUR-ACCOUNT-ID/queue-1 https://sqs.us-east-1.amazonaws.com/YOUR-ACCOUNT-ID/queue-2
+python sqs_queues.py queue-1 queue-2 queue-3
 ```
 
 **Import in Python:**
 ```python
 from sqs_queues import get_queues_message_totals
 
-queues = [
-    "https://sqs.us-east-1.amazonaws.com/YOUR-ACCOUNT-ID/processing-queue",
-    "https://sqs.us-east-1.amazonaws.com/YOUR-ACCOUNT-ID/notification-queue"
-]
-
-totals = get_queues_message_totals(queues)
+queue_names = ["queue-1", "queue-2"]
+totals = get_queues_message_totals(queue_names)
 print(totals)
 ```
 
 ### Output
 
 ```
-Queue: processing-queue, Messages: 42
-Queue: processing-queue-dlq, Messages: 2
-Queue: notification-queue, Messages: 0
-Queue: notification-queue-dlq, Messages: 0
+queue-1: 42 messages
+queue-1-dlq: 2 messages
+queue-2: 0 messages
+queue-2-dlq: 0 messages
 ```
 
 ### Features
 
 - **Automatic DLQ Discovery**: The script automatically finds and includes dead letter queue message counts
 - **Error Handling**: Failed queue operations are logged to stderr and return `None`
-- **Flexible Input**: Accepts full SQS queue URLs
+- **Queue Name Input**: Accepts queue names (not full URLs) - AWS SDK handles URL resolution
 - **Dual Interface**: Works both as a command-line tool and importable Python module
 
 ### Notes
 
 - Dead letter queue names shouldn't be passed to the function - they're discovered automatically
-- The script requires full queue URLs, not just queue names
+- The script accepts queue names and uses AWS SDK to resolve full URLs automatically
 - Any errors accessing queues are printed to stderr whilst continuing to process other queues
+- Ensure your AWS credentials are configured with appropriate SQS permissions
